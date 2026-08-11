@@ -164,16 +164,17 @@ function Library.new(config)
 	----------------------------------------------------
 	-- Janela principal
 	----------------------------------------------------
-	local windowW, windowH = 640, 340
+	local windowW, windowH = 640, 380
 	if mobile then
-		windowW, windowH = 380, 260
+		windowW, windowH = 380, 300
 	end
 
 	local main = new("Frame", {
 		Name = "Main",
 		BackgroundColor3 = Theme.Background,
+		AnchorPoint = Vector2.new(0.5, 0.5),
 		Size = UDim2.fromOffset(windowW, windowH),
-		Position = UDim2.new(0.5, -windowW/2, 0.5, -windowH/2),
+		Position = UDim2.new(0.5, 0, 0.5, 0),
 		ClipsDescendants = true,
 		Parent = screenGui,
 	})
@@ -200,18 +201,21 @@ function Library.new(config)
 	----------------------------------------------------
 	-- Topbar
 	----------------------------------------------------
+	local TOPBAR_H = 50
+
 	local topbar = new("Frame", {
 		Name = "Topbar",
 		BackgroundColor3 = Theme.Sidebar,
-		Size = UDim2.new(1, 0, 0, 42),
+		Size = UDim2.new(1, 0, 0, TOPBAR_H),
+		ClipsDescendants = true,
 		Parent = main,
 	})
 	corner(14).Parent = topbar
-	-- corrige o corner só em cima
+	-- corrige o corner só em cima (quadra a parte de baixo do topbar)
 	local topbarFix = new("Frame", {
 		BackgroundColor3 = Theme.Sidebar,
-		Size = UDim2.new(1, 0, 0, 14),
-		Position = UDim2.new(0, 0, 1, -14),
+		Size = UDim2.new(1, 0, 0, 16),
+		Position = UDim2.new(0, 0, 1, -16),
 		BorderSizePixel = 0,
 		Parent = topbar,
 	})
@@ -223,8 +227,9 @@ function Library.new(config)
 		TextSize = 15,
 		TextColor3 = Theme.Text,
 		TextXAlignment = Enum.TextXAlignment.Left,
-		Position = UDim2.new(0, 14, 0, 0),
-		Size = UDim2.new(0.5, 0, 1, 0),
+		TextTruncate = Enum.TextTruncate.AtEnd,
+		Position = UDim2.new(0, 14, 0, 8),
+		Size = UDim2.new(0.55, 0, 0, 18),
 		Parent = topbar,
 	})
 
@@ -235,20 +240,18 @@ function Library.new(config)
 		TextSize = 12,
 		TextColor3 = Theme.SubText,
 		TextXAlignment = Enum.TextXAlignment.Left,
-		Position = UDim2.new(0, 14, 0, 14),
-		Size = UDim2.new(0.5, 0, 1, 0),
+		TextTruncate = Enum.TextTruncate.AtEnd,
+		Position = UDim2.new(0, 14, 0, 26),
+		Size = UDim2.new(0.55, 0, 0, 16),
 		Parent = topbar,
 	})
-	subLabel.Position = UDim2.new(0, 14, 0.5, 0)
-	titleLabel.Size = UDim2.new(0.5, 0, 0.5, 0)
-	titleLabel.Position = UDim2.new(0, 14, 0, 2)
 
 	-- Botão Fechar
 	local closeBtn = new("TextButton", {
 		Name = "CloseButton",
 		BackgroundColor3 = Theme.Surface,
 		Size = UDim2.fromOffset(28, 28),
-		Position = UDim2.new(1, -38, 0.5, -14),
+		Position = UDim2.new(1, -38, 0, TOPBAR_H/2 - 14),
 		Text = "X",
 		Font = Theme.Font,
 		TextSize = 14,
@@ -263,7 +266,7 @@ function Library.new(config)
 		Name = "MinimizeButton",
 		BackgroundColor3 = Theme.Surface,
 		Size = UDim2.fromOffset(28, 28),
-		Position = UDim2.new(1, -74, 0.5, -14),
+		Position = UDim2.new(1, -74, 0, TOPBAR_H/2 - 14),
 		Text = "-",
 		Font = Theme.Font,
 		TextSize = 18,
@@ -285,13 +288,13 @@ function Library.new(config)
 	----------------------------------------------------
 	-- Sidebar (abas)
 	----------------------------------------------------
-	local sidebarW = mobile and 78 or 140
+	local sidebarW = mobile and 92 or 172
 
 	local sidebar = new("Frame", {
 		Name = "Sidebar",
 		BackgroundColor3 = Theme.Sidebar,
-		Size = UDim2.new(0, sidebarW, 1, -42),
-		Position = UDim2.new(0, 0, 0, 42),
+		Size = UDim2.new(0, sidebarW, 1, -TOPBAR_H),
+		Position = UDim2.new(0, 0, 0, TOPBAR_H),
 		Parent = main,
 	})
 
@@ -308,8 +311,8 @@ function Library.new(config)
 	local content = new("Frame", {
 		Name = "Content",
 		BackgroundTransparency = 1,
-		Size = UDim2.new(1, -sidebarW, 1, -42),
-		Position = UDim2.new(0, sidebarW, 0, 42),
+		Size = UDim2.new(1, -sidebarW, 1, -TOPBAR_H),
+		Position = UDim2.new(0, sidebarW, 0, TOPBAR_H),
 		Parent = main,
 	})
 	self.Content = content
@@ -321,6 +324,7 @@ function Library.new(config)
 	local minimizedBtn = new("TextButton", {
 		Name = "MinimizedIcon",
 		BackgroundColor3 = Theme.Purple,
+		AnchorPoint = Vector2.new(0.5, 0.5),
 		Size = UDim2.fromOffset(46, 46),
 		Position = main.Position,
 		Text = "",
@@ -331,15 +335,14 @@ function Library.new(config)
 	corner(14).Parent = minimizedBtn
 	stroke(Theme.PurpleGlow, 1.5, 0.3).Parent = minimizedBtn
 
-	local minIconLabel = new("TextLabel", {
-		BackgroundTransparency = 1,
-		Text = "◆",
-		Font = Theme.Font,
-		TextSize = 18,
-		TextColor3 = Theme.Text,
-		Size = UDim2.fromScale(1,1),
+	local minIconDot = new("Frame", {
+		BackgroundColor3 = Theme.Text,
+		Size = UDim2.fromOffset(14, 14),
+		AnchorPoint = Vector2.new(0.5, 0.5),
+		Position = UDim2.fromScale(0.5, 0.5),
 		Parent = minimizedBtn,
 	})
+	corner(7).Parent = minIconDot
 
 	makeDraggable(minimizedBtn, minimizedBtn)
 	makeDraggable(topbar, main)
@@ -350,17 +353,17 @@ function Library.new(config)
 		if state then
 			minimizedBtn.Position = main.Position
 			minimizedBtn.Visible = true
-			minimizedBtn.Size = UDim2.fromOffset(0,0)
-			tween(main, TWEEN_MED, {Size = UDim2.fromOffset(0,0)})
-			tween(minimizedBtn, TWEEN_SPRING, {Size = UDim2.fromOffset(46,46)})
-			task.delay(0.28, function()
+			minimizedBtn.Size = UDim2.fromOffset(0, 0)
+			tween(main, TWEEN_MED, {Size = UDim2.fromOffset(0, 0)})
+			tween(minimizedBtn, TWEEN_SPRING, {Size = UDim2.fromOffset(46, 46)})
+			task.delay(0.26, function()
 				main.Visible = false
 			end)
 		else
 			main.Visible = true
 			main.Position = minimizedBtn.Position
-			main.Size = UDim2.fromOffset(0,0)
-			tween(minimizedBtn, TWEEN_FAST, {Size = UDim2.fromOffset(0,0)})
+			main.Size = UDim2.fromOffset(0, 0)
+			tween(minimizedBtn, TWEEN_FAST, {Size = UDim2.fromOffset(0, 0)})
 			tween(main, TWEEN_SPRING, {Size = UDim2.fromOffset(windowW, windowH)})
 			task.delay(0.2, function()
 				minimizedBtn.Visible = false
@@ -376,20 +379,20 @@ function Library.new(config)
 	end)
 
 	closeBtn.MouseButton1Click:Connect(function()
-		tween(main, TWEEN_FAST, {Size = UDim2.fromOffset(0,0), BackgroundTransparency = 1})
+		tween(main, TWEEN_FAST, {Size = UDim2.fromOffset(0, 0)})
 		task.delay(0.2, function()
 			screenGui:Destroy()
 		end)
 	end)
 
 	----------------------------------------------------
-	-- Intro animation
+	-- Intro animation (cresce a partir do centro)
 	----------------------------------------------------
-	main.Size = UDim2.fromOffset(0,0)
-	main.Position = UDim2.new(0.5, 0, 0.5, 0)
+	local finalPos = main.Position
+	main.Size = UDim2.fromOffset(0, 0)
 	tween(main, TWEEN_SPRING, {
 		Size = UDim2.fromOffset(windowW, windowH),
-		Position = UDim2.new(0.5, -windowW/2, 0.5, -windowH/2),
+		Position = finalPos,
 	})
 
 	self._windowSize = Vector2.new(windowW, windowH)
@@ -428,10 +431,11 @@ function Library:AddTab(name, icon)
 		Font = Theme.FontRegular,
 		TextSize = 13,
 		TextColor3 = Theme.SubText,
-		Size = UDim2.new(1, -16, 1, 0),
+		Size = UDim2.new(1, -18, 1, 0),
 		Position = UDim2.new(0, 12, 0, 0),
 		TextXAlignment = Enum.TextXAlignment.Left,
 		TextTruncate = Enum.TextTruncate.AtEnd,
+		TextWrapped = false,
 		Parent = tabButton,
 	})
 
@@ -557,7 +561,7 @@ function Library:AddTab(name, icon)
 
 		local arrow = new("TextLabel", {
 			BackgroundTransparency = 1,
-			Text = "›",
+			Text = ">",
 			Font = Theme.Font,
 			TextSize = 16,
 			TextColor3 = Theme.Purple,
@@ -808,7 +812,7 @@ function Library:AddTab(name, icon)
 
 		local arrowIcon = new("TextLabel", {
 			BackgroundTransparency = 1,
-			Text = "▾",
+			Text = "v",
 			Font = Theme.Font,
 			TextSize = 12,
 			TextColor3 = Theme.Purple,
